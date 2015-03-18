@@ -1,12 +1,14 @@
 #!/bin/bash
 
+PATH=${PATH}:/usr/sbin:/usr/bin:/opt/aws/bin:/opt/aws/bin
+HOME=/root # Fix bug/problem with cronie in Amazon Linux (HOME=/ there)
 # BACKEND_LAYER="$(cat /etc/varnish/backend-layer)"
 
 VARNISH_MAINFILE="/etc/varnish/autoscalinggroup.vcl"
 VARNISH_BACKENDSFILE="/etc/varnish/backends.vcl"
 
 BACKEND_LAYER="$(aws ec2 describe-tags  --filters "Name=resource-id,Values=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)" "Name=key,Values=backend-layer" | jq -r ".Tags[0].Value")"
-BACKEND_LAYER="ASG-Apache"
+# BACKEND_LAYER="ASG-Apache"
 
 
 BACKENDS_DEFS=""
@@ -47,10 +49,10 @@ if [ -e $MD5SUM_STATEFILE ] ; then
 		# Nothing to do
 		exit
 	else
-		echo $MD5SUM_NEW > $MD5SUM_STATEFILE
+		echo $MD5SUM_NEW >$MD5SUM_STATEFILE
 	fi
 else
-	echo $MD5SUM_NEW > $MD5SUM_STATEFILE
+	echo $MD5SUM_NEW >$MD5SUM_STATEFILE
 fi
 
 # We haven't exited, so continue to generate the file
@@ -80,8 +82,11 @@ EOF
 #exit
 
 TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+# Load (& compile) new vcl
 varnishadm vcl.load vcl-${TIMESTAMP} $VARNISH_MAINFILE
+# Switch active vcl to the new one
 varnishadm vcl.use vcl-${TIMESTAMP}
+# Scan and delete old vcls
 for i in $(varnishadm vcl.list |egrep -v "^active" |awk '{print $3;}') ; do 
 	varnishadm vcl.discard "${i}"
 done
