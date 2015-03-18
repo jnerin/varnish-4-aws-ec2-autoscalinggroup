@@ -86,4 +86,4 @@ for i in $(varnishadm vcl.list |egrep -v "^active" |awk '{print $3;}') ; do
 	varnishadm vcl.discard "${i}"
 done
 
-logger --priority user.notice "$BACKEND_NAME varnish vcl updated with $(echo $INSTANCES | wc --lines) backends ($(echo $INSTANCES |paste --serial --delimiter=, ))"
+logger --priority user.notice "$BACKEND_NAME varnish vcl updated with $(echo "$INSTANCES" | wc --lines) backends ($(echo "$INSTANCES" |paste --serial --delimiter=, ))"
