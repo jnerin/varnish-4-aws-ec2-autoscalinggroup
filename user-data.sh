@@ -8,7 +8,7 @@ YUM=$( (lsb_release --id --short |egrep -qi "\b(redhat|fedora|centos)\b" || yum 
 if [ $APT -eq 0 ] ; then
 	apt-get install -y apt-transport-https awscli jq
 elif [ $YUM -eq 0 ] ; then
-	yum install -y awscli jq
+	yum install -y aws-cli jq
 fi
 AWS_REGION="eu-west-1"
 
@@ -41,7 +41,15 @@ fi
 curl -o /etc/varnish/autoscalinggroup.vcl https://raw.githubusercontent.com/jnerin/varnish-4-aws-ec2-autoscalinggroup/master/varnish/autoscalinggroup.vcl
 
 # Change the varnish boot vcl
-sed -ri.orig -e 's/^([^#].*-f \/etc\/varnish\/).*\.vcl/\1autoscalinggroup.vcl/' /etc/default/varnish
+if [ $APT -eq 0 ] ; then
+	sed -ri.orig -e 's/^([^#].*-f \/etc\/varnish\/).*\.vcl/\1autoscalinggroup.vcl/' /etc/default/varnish
+elif [ $YUM -eq 0 ] ; then
+	sed -ri.orig -e '
+	s/^([^#]*VARNISH_VCL_CONF=\/etc\/varnish\/).*\.vcl/\1autoscalinggroup.vcl/;
+	s/^([^#].*-f \/etc\/varnish\/).*\.vcl/\1autoscalinggroup.vcl/
+	' /etc/sysconfig/varnish
+fi
+
 
 
 echo "${BACKEND_LAYER}" >/etc/varnish/backend-layer
