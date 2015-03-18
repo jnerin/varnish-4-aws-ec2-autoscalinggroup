@@ -2,13 +2,13 @@
 # The idea is that the user-data of the AutoScalingGroup is something like:
 # curl -sL https://raw.githubusercontent.com/jnerin/varnish-4-aws-ec2-autoscalinggroup/master/user-data.sh | bash -s --
 
-APT=$(lsb_release --id --short |egrep -qi "\b(debian|ubuntu)\b" ; echo $?)
-YUM=$(lsb_release --id --short |egrep -qi "\b(redhat|fedora|centos)\b" ; echo $?)
+APT=$( (lsb_release --id --short |egrep -qi "\b(debian|ubuntu)\b" || apt &>/dev/null ); echo $?)
+YUM=$( (lsb_release --id --short |egrep -qi "\b(redhat|fedora|centos)\b" || yum --version >/dev/null); echo $? )
 
 if [ $APT -eq 0 ] ; then
-	apt-get install apt-transport-https awscli jq
+	apt-get install -y apt-transport-https awscli jq
 elif [ $YUM -eq 0 ] ; then
-	yum install awscli jq
+	yum install -y awscli jq
 fi
 AWS_REGION="eu-west-1"
 
@@ -34,7 +34,7 @@ if [ $APT -eq 0 ] ; then
 	apt-get -y install varnish 
 elif [ $YUM -eq 0 ] ; then
 	rpm --nosignature -i https://repo.varnish-cache.org/redhat/varnish-4.0.el6.rpm
-	yum install varnish
+	yum install -y varnish
 fi
 
 
