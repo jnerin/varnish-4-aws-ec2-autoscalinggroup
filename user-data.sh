@@ -1,4 +1,6 @@
 #!/bin/bash
+# The idea is that the user-data of the AutoScalingGroup is something like:
+# curl -s https://github.com/jnerin/varnish-4-aws-ec2-autoscalinggroup/raw/master/user-data.sh | bash -s --
 
 apt-get install apt-transport-https awscli jq
 
