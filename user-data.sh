@@ -1,6 +1,6 @@
 #!/bin/bash
 # The idea is that the user-data of the AutoScalingGroup is something like:
-# curl -s https://github.com/jnerin/varnish-4-aws-ec2-autoscalinggroup/raw/master/user-data.sh | bash -s --
+# curl -sL https://raw.githubusercontent.com/jnerin/varnish-4-aws-ec2-autoscalinggroup/master/user-data.sh | bash -s --
 
 APT=$(lsb_release --id --short |egrep -qi "\b(debian|ubuntu)\b" ; echo $?)
 YUM=$(lsb_release --id --short |egrep -qi "\b(redhat|fedora|centos)\b" ; echo $?)
@@ -41,7 +41,7 @@ fi
 curl -o /etc/varnish/autoscalinggroup.vcl https://raw.githubusercontent.com/jnerin/varnish-4-aws-ec2-autoscalinggroup/master/varnish/autoscalinggroup.vcl
 
 # Change the varnish boot vcl
-sed -ri.orig -e 's/^([^#].*-f \/etc\/varnish\/).*\.vcl/\1autoscalinggroup.vcl/' /etc/defaults/varnish
+sed -ri.orig -e 's/^([^#].*-f \/etc\/varnish\/).*\.vcl/\1autoscalinggroup.vcl/' /etc/default/varnish
 
 
 echo "${BACKEND_LAYER}" >/etc/varnish/backend-layer
