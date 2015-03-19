@@ -59,3 +59,8 @@ curl -Lo /etc/varnish/generate-backends.sh https://github.com/jnerin/varnish-4-a
 chmod 750 /etc/varnish/generate-backends.sh 
 /etc/varnish/generate-backends.sh
 
+# Amazon Linux with cronie
+echo "* * * * * root /etc/varnish/generate-backends.sh" >>/etc/crontab
+crontab /etc/crontab
+
+
