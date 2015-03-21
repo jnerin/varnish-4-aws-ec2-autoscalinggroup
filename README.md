@@ -74,12 +74,12 @@ generate-backends.sh checks every minute for changes in the lists of running ins
 This is mostly a WIP (Work In Progress) so a lot of things that shouldn't be hardcoded are, notably:
 
 - user-data.sh
--- AWS_REGION
--- github urls of the vcls and scripts (you should configure them anyway)
+  - AWS_REGION
+  - github urls of the vcls and scripts (you should configure them anyway)
 - generate-backends.sh
--- You should configure the .probe section of the backends
--- backends director algorithm
+  - You should configure the .probe section of the backends
+  - backends director algorithm
 - autoscalinggroup.vcl
--- It's just an void vcl to show how to work with backends.vcl, you have to configure it for your needs.
+  - It's just an void vcl to show how to work with backends.vcl, you have to configure it for your needs.
 
 
