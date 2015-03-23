@@ -1,0 +1,236 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Resources": {
+    "asgASGApache": {
+      "Type": "AWS::AutoScaling::AutoScalingGroup",
+      "Properties": {
+        "AvailabilityZones": [
+          "eu-west-1b"
+        ],
+        "Cooldown": "300",
+        "DesiredCapacity": "2",
+        "MaxSize": "3",
+        "MinSize": "2",
+        "HealthCheckGracePeriod": "300",
+        "HealthCheckType": "EC2",
+        "VPCZoneIdentifier": [
+          "subnet-0f03b078"
+        ],
+        "NotificationConfiguration": {
+          "TopicARN": "arn:aws:sns:eu-west-1:334523526103:Notificaciones-ASG-Varnish",
+          "NotificationTypes": [
+            "autoscaling:EC2_INSTANCE_LAUNCH",
+            "autoscaling:EC2_INSTANCE_LAUNCH_ERROR",
+            "autoscaling:EC2_INSTANCE_TERMINATE",
+            "autoscaling:EC2_INSTANCE_TERMINATE_ERROR"
+          ]
+        },
+        "LaunchConfigurationName": {
+          "Ref": "lcApacheLayer"
+        },
+        "Tags": [
+          {
+            "Key": "Layer",
+            "Value": "Apache",
+            "PropagateAtLaunch": true
+          },
+          {
+            "Key": "Name",
+            "Value": "ApacheLayer instance",
+            "PropagateAtLaunch": true
+          },
+          {
+            "Key": "project:git",
+            "Value": "jnerin/varnish-4-aws-ec2-autoscalinggroup",
+            "PropagateAtLaunch": true
+          }
+        ]
+      }
+    },
+    "asgASGVarnish": {
+      "Type": "AWS::AutoScaling::AutoScalingGroup",
+      "Properties": {
+        "AvailabilityZones": [
+          "eu-west-1b"
+        ],
+        "Cooldown": "300",
+        "DesiredCapacity": "1",
+        "MaxSize": "3",
+        "MinSize": "1",
+        "HealthCheckGracePeriod": "300",
+        "HealthCheckType": "EC2",
+        "VPCZoneIdentifier": [
+          "subnet-0f03b078"
+        ],
+        "NotificationConfiguration": {
+          "TopicARN": "arn:aws:sns:eu-west-1:334523526103:Notificaciones-ASG-Varnish",
+          "NotificationTypes": [
+            "autoscaling:EC2_INSTANCE_LAUNCH",
+            "autoscaling:EC2_INSTANCE_LAUNCH_ERROR",
+            "autoscaling:EC2_INSTANCE_TERMINATE",
+            "autoscaling:EC2_INSTANCE_TERMINATE_ERROR"
+          ]
+        },
+        "LaunchConfigurationName": {
+          "Ref": "lcVarnishLayer"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "Varnish instance",
+            "PropagateAtLaunch": true
+          },
+          {
+            "Key": "backend-layer",
+            "Value": "ASG-Apache",
+            "PropagateAtLaunch": true
+          },
+          {
+            "Key": "project:git",
+            "Value": "jnerin/varnish-4-aws-ec2-autoscalinggroup",
+            "PropagateAtLaunch": true
+          }
+        ]
+      }
+    },
+    "lcApacheLayer": {
+      "Type": "AWS::AutoScaling::LaunchConfiguration",
+      "Properties": {
+        "ImageId": "ami-47178030",
+        "InstanceType": "t2.micro",
+        "KeyName": "home",
+        "SecurityGroups": [
+          {
+            "Ref": "sgsgSshHttp"
+          }
+        ],
+        "BlockDeviceMappings": [
+          {
+            "DeviceName": "/dev/sdd"
+          },
+          {
+            "DeviceName": "/dev/sdb"
+          },
+          {
+            "DeviceName": "/dev/sda1",
+            "Ebs": {
+              "VolumeSize": 10
+            }
+          },
+          {
+            "DeviceName": "/dev/sdc"
+          },
+          {
+            "DeviceName": "/dev/sde"
+          }
+        ]
+      }
+    },
+    "lcVarnishLayer": {
+      "Type": "AWS::AutoScaling::LaunchConfiguration",
+      "Properties": {
+        "ImageId": "ami-9d23aeea",
+        "InstanceType": "t2.micro",
+        "KeyName": "home",
+        "IamInstanceProfile": "aws-cli",
+        "SecurityGroups": [
+          {
+            "Ref": "sgsgSshHttp"
+          }
+        ],
+        "BlockDeviceMappings": [
+          {
+            "DeviceName": "/dev/xvda",
+            "Ebs": {
+              "VolumeSize": 8
+            }
+          }
+        ]
+      }
+    },
+    "sgsgSshHttp": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "SSH & HTTP open",
+        "VpcId": "vpc-be75a8db",
+        "SecurityGroupIngress": [
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "22",
+            "ToPort": "22",
+            "CidrIp": "0.0.0.0/0"
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "80",
+            "ToPort": "80",
+            "CidrIp": "0.0.0.0/0"
+          }
+        ],
+        "SecurityGroupEgress": [
+          {
+            "IpProtocol": "-1",
+            "CidrIp": "0.0.0.0/0"
+          }
+        ]
+      }
+    },
+    "scalingDecreaseGroupSize": {
+      "Type": "AWS::AutoScaling::ScalingPolicy",
+      "Properties": {
+        "AdjustmentType": "ChangeInCapacity",
+        "Cooldown": "300",
+        "ScalingAdjustment": "-1",
+        "AutoScalingGroupName": {
+          "Ref": "asgASGApache"
+        }
+      }
+    },
+    "scalingIncreaseGroupSize": {
+      "Type": "AWS::AutoScaling::ScalingPolicy",
+      "Properties": {
+        "AdjustmentType": "ChangeInCapacity",
+        "Cooldown": "300",
+        "ScalingAdjustment": "1",
+        "AutoScalingGroupName": {
+          "Ref": "asgASGApache"
+        }
+      }
+    },
+    "ingress8": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgsgSshHttp"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "22",
+        "ToPort": "22",
+        "CidrIp": "0.0.0.0/0"
+      }
+    },
+    "ingress9": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgsgSshHttp"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "80",
+        "ToPort": "80",
+        "CidrIp": "0.0.0.0/0"
+      }
+    },
+    "egress3": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgsgSshHttp"
+        },
+        "IpProtocol": "-1",
+        "CidrIP": "0.0.0.0/0"
+      }
+    }
+  },
+  "Description": "varnish-4-aws-ec2-autoscalinggroup\r\n\r\nTemplate for using Varnish 4 in an AWS AutoScalingGroup with autoconfiguration of the available backends.\r\n\r\nhttps://github.com/jnerin/varnish-4-aws-ec2-autoscalinggroup"
+}

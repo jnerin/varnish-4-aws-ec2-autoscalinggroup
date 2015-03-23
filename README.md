@@ -86,6 +86,10 @@ include "backends.vcl";
 sub vcl_init {
 	call backends_init;
 }
+
+sub vcl_recv {
+    set req.backend_hint = vdir.backend();
+}
 # Rest of the vcl...
 ```
 
@@ -112,4 +116,6 @@ This is mostly a WIP (Work In Progress) so a lot of things that shouldn't be har
 - autoscalinggroup.vcl
   - It's just an dummy vcl to show how to work with backends.vcl, you have to configure it for your needs.
 
+## Template
 
+There is now a [CloudFormation template](CloudFormation.template) for quick test and deployment.
