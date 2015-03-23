@@ -4,7 +4,7 @@
 
 
 
-cat > /opt/bitnami/apache2/htdocs/test.php <<EOF
+cat > /opt/bitnami/apache2/htdocs/test.php <<'EOF'
 <?php
 $TTL=5;
 header('Expires: ' . gmdate('D, d M Y H:i:s', time() + $TTL) . ' GMT');
