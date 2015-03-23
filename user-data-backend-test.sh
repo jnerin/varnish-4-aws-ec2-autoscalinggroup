@@ -1,4 +1,7 @@
 #!/bin/bash
+# The idea is that the user-data of the AutoScalingGroup is something like:
+# curl -sL https://raw.githubusercontent.com/jnerin/varnish-4-aws-ec2-autoscalinggroup/master/user-data-backend-test.sh | bash -s --
+
 
 
 cat > /opt/bitnami/apache2/htdocs/test.php <<EOF

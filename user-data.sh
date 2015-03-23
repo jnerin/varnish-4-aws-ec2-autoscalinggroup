@@ -10,10 +10,11 @@ if [ $APT -eq 0 ] ; then
 elif [ $YUM -eq 0 ] ; then
 	yum install -y aws-cli jq
 fi
+
 AWS_REGION="eu-west-1"
 
-mkdir -p $HOME/.aws
-cat > $HOME/.aws/config <<EOF
+mkdir -p /root/.aws
+cat > /root/.aws/config <<EOF
 [default]
 region=${AWS_REGION}
 
@@ -46,6 +47,7 @@ if [ $APT -eq 0 ] ; then
 	sed -ri.orig -e 's/^([^#].*-f \/etc\/varnish\/).*\.vcl/\1autoscalinggroup.vcl/' /etc/default/varnish
 elif [ $YUM -eq 0 ] ; then
 	sed -ri.orig -e '
+	s/^([^#]*VARNISH_LISTEN_PORT)=.*$/\1=80/;
 	s/^([^#]*VARNISH_VCL_CONF=\/etc\/varnish\/).*\.vcl/\1autoscalinggroup.vcl/;
 	s/^([^#].*-f \/etc\/varnish\/).*\.vcl/\1autoscalinggroup.vcl/
 	' /etc/sysconfig/varnish
