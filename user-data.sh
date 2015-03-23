@@ -35,7 +35,7 @@ if [ $APT -eq 0 ] ; then
 elif [ $YUM -eq 0 ] ; then
 	rpm --nosignature -i https://repo.varnish-cache.org/redhat/varnish-4.0.el6.rpm
 	echo "priority=10" >>/etc/yum.repos.d/varnish.repo
-	yum update -y varnish
+	yum install -y varnish
 fi
 
 

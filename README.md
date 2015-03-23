@@ -1,6 +1,36 @@
 # varnish 4 AWS EC2 AutoScalingGroup
 
-Template for using Varnish 4 in an AWS AutoScalingGroup with autoconfiguration of the available backends
+Template for using Varnish 4 in an AWS AutoScalingGroup with autoconfiguration of the available backends.
+
+```
++--------------------------------------------------+
+|                                                  |
+| Varnish Layer                                    |
+|                                                  |
+| +-----------+  +-----------+       +-----------+ |
+| | Varnish 1 |  | Varnish 2 |  ...  | Varnish n | |
+| |           |  |           |       |           | |
+| +-+-+-+-----+  +-----------+       +-----------+ |
+|   | | |                                          |
++--------------------------------------------------+
+    | | |                                           
+    | | |                                           
+    | | |                                           
+    | | +------------------------------+            
+    | |                                |            
+    | +-----------+                    |            
+    |             |                    |            
++--------------------------------------------------+
+|   |             |                    |           |
+| Backend Layer   |                    |           |
+|   |             |                    |           |
+| +-v--------+  +-v--------+         +-v--------+  |
+| | Apache 1 |  | Apache 2 |   ...   | Apache n |  |
+| |          |  |          |         |          |  |
+| +----------+  +----------+         +----------+  |
+|                                                  |
++--------------------------------------------------+
+```
 
 ## Problem
 
@@ -78,8 +108,8 @@ This is mostly a WIP (Work In Progress) so a lot of things that shouldn't be har
   - github urls of the vcls and scripts (you should configure them anyway)
 - generate-backends.sh
   - You should configure the .probe section of the backends
-  - backends director algorithm
+  - backends director algorithm (another interesting choice migth be hash, choose your key wisely)
 - autoscalinggroup.vcl
-  - It's just an void vcl to show how to work with backends.vcl, you have to configure it for your needs.
+  - It's just an dummy vcl to show how to work with backends.vcl, you have to configure it for your needs.
 
 
