@@ -99,6 +99,8 @@ Caveats, I have only tested this with Amazon Linux instances, I have tried to su
 
 The idea is that you create two auto scaling groups, one for the backend layer (Apache, nginx, whatever) and another for the Varnish layer, and in the auto scalong group of the Varnish layer you add a tag called "backend-layer" and put there the name of the autoscaling group that contains the backends. The [user-data script](user-data.sh) and [generate-backends.sh](varnish/generate-backends.sh) will read it. 
 
+For this to work the Varnish layer instances needs access to several aws apis, so you should attach a policy similar to the one that it's later presented.
+
 The user-data script assumes an Amazon Linux instance (but kind of works also in generic debian and rpm/yum distros) and installs aws command line tools, the jq json command line parser, and the official repository and last version of varnish. Then it tries to change the default vcl for Varnish to the one it downloads and lasts it adds a cronjob to /etc/crontab and adds it to cronie to launch generate-backends.sh every minute.
 
 generate-backends.sh checks every minute for changes in the lists of running instances in the auto scaling group named in the tag backend-layer. If it detects a change it regenerates backends.vcl and loads the new vcl in varnish and switches over to it discarding the old vcls.
@@ -116,6 +118,43 @@ This is mostly a WIP (Work In Progress) so a lot of things that shouldn't be har
 - autoscalinggroup.vcl
   - It's just an dummy vcl to show how to work with backends.vcl, you have to configure it for your needs.
 
+
+### IAM Policy for the Varnish Layer instances
+
+```
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "autoscaling:DescribeAutoScalingGroups",
+                "autoscaling:DescribeAutoScalingInstances"
+            ],
+            "Resource": [
+                "*"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ec2:DescribeInstances",
+                "ec2:DescribeTags"
+            ],
+            "Resource": [
+                "*"
+            ]
+        }
+    ]
+}
+```
+
+This is the aws-cli policy referenced in the [CloudFormation template](CloudFormation.template).
+
+
 ## Template
 
 There is now a [CloudFormation template](CloudFormation.template) for quick test and deployment.
+
+After launching the template (with the correct policy) you can test it by connecting to http://(DNS or IP)/test.php of one of the varnish instances and repeatedly hitting refresh to see how each time the TTL (5s in the test.php script) is over it'll probably switch to a different backend.
+
