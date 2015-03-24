@@ -6,6 +6,7 @@ Template for using Varnish 4 in an AWS AutoScalingGroup with autoconfiguration o
 +--------------------------------------------------+
 |                                                  |
 | Varnish Layer                                    |
+| Tag [backend-layer: ASG-Apache]                  |
 |                                                  |
 | +-----------+  +-----------+       +-----------+ |
 | | Varnish 1 |  | Varnish 2 |  ...  | Varnish n | |
@@ -23,6 +24,7 @@ Template for using Varnish 4 in an AWS AutoScalingGroup with autoconfiguration o
 +--------------------------------------------------+
 |   |             |                    |           |
 | Backend Layer   |                    |           |
+| Tag [Name: ASG-Apache]               |           |
 |   |             |                    |           |
 | +-v--------+  +-v--------+         +-v--------+  |
 | | Apache 1 |  | Apache 2 |   ...   | Apache n |  |
@@ -92,6 +94,8 @@ sub vcl_recv {
 }
 # Rest of the vcl...
 ```
+
+The script consults the list of instances inside the autoscaling group called like the value of the tag "backend-layer" in its own instance (set in the autoscaling group as a PropagateAtLaunch=true), and then lists the ips of these instances to generate the backends.vcl.
 
 ## Usage
 
