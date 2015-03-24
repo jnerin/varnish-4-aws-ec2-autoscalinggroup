@@ -34,6 +34,10 @@ Template for using Varnish 4 in an AWS AutoScalingGroup with autoconfiguration o
 +--------------------------------------------------+
 ```
 
+Or in a more graphical view:
+![autoscalinggroups_backends](autoscalinggroups_backends.png?raw=true)
+
+
 ## Problem
 
 The problem of using varnish with either an ELB (Elastic Load Balancer) or to a layer of backend servers is that you must configure the ip addresses of the backends in each varnish instance, and you can't use dns names that resolve to more than 1 ip. So you can't put an ELB behind varnish directly because it's name resolves to more that 1 ip, and it even changes as it scales.
@@ -95,7 +99,7 @@ sub vcl_recv {
 # Rest of the vcl...
 ```
 
-The script consults the list of instances inside the autoscaling group called like the value of the tag "backend-layer" in its own instance (set in the autoscaling group as a PropagateAtLaunch=true), and then lists the ips of these instances to generate the backends.vcl.
+The script consults the list of instances inside the autoscaling group named like the value of the tag "backend-layer" in its own instance (set in the autoscaling group as a PropagateAtLaunch=true), and then lists the ips of these instances to generate the backends.vcl.
 
 ## Usage
 
