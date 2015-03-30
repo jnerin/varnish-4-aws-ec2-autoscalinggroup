@@ -1,7 +1,7 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
   "Resources": {
-    "asgASGApache": {
+    "ASG-Apache": {
       "Type": "AWS::AutoScaling::AutoScalingGroup",
       "Properties": {
         "AvailabilityZones": [
@@ -47,7 +47,7 @@
         ]
       }
     },
-    "asgASGVarnish": {
+    "ASG-Varnish": {
       "Type": "AWS::AutoScaling::AutoScalingGroup",
       "Properties": {
         "AvailabilityZones": [
@@ -106,22 +106,10 @@
         ],
         "BlockDeviceMappings": [
           {
-            "DeviceName": "/dev/sdd"
-          },
-          {
-            "DeviceName": "/dev/sdb"
-          },
-          {
             "DeviceName": "/dev/sda1",
             "Ebs": {
               "VolumeSize": 10
             }
-          },
-          {
-            "DeviceName": "/dev/sdc"
-          },
-          {
-            "DeviceName": "/dev/sde"
           }
         ]
       }
@@ -228,7 +216,7 @@
           "Ref": "sgsgSshHttp"
         },
         "IpProtocol": "-1",
-        "CidrIP": "0.0.0.0/0"
+        "CidrIp": "0.0.0.0/0"
       }
     }
   },

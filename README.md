@@ -166,3 +166,6 @@ There is now a [CloudFormation template](CloudFormation.template) for quick test
 
 After launching the template (with the correct policy) you can test it by connecting to http://(DNS or IP)/test.php of one of the varnish instances and repeatedly hitting refresh to see how each time the TTL (5s in the test.php script) is over it'll probably switch to a different backend.
 
+The CloudFormation script seems to output a few syntax errors (CidrIP -> CidrIp and empty DeviceName without Ebs or VirtualName), and it renames the assests when generating the stack and later when launching it. So you migth have to search for the backend-layer name in the aws:cloudformation:logical-id tag, (aws:cloudformation:logical-id: ASG-Apache)
+
+
