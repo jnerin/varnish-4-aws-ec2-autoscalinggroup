@@ -16,15 +16,6 @@
         "VPCZoneIdentifier": [
           "subnet-0f03b078"
         ],
-        "NotificationConfiguration": {
-          "TopicARN": "arn:aws:sns:eu-west-1:334523526103:Notificaciones-ASG-Varnish",
-          "NotificationTypes": [
-            "autoscaling:EC2_INSTANCE_LAUNCH",
-            "autoscaling:EC2_INSTANCE_LAUNCH_ERROR",
-            "autoscaling:EC2_INSTANCE_TERMINATE",
-            "autoscaling:EC2_INSTANCE_TERMINATE_ERROR"
-          ]
-        },
         "LaunchConfigurationName": {
           "Ref": "lcApacheLayer"
         },
@@ -62,15 +53,6 @@
         "VPCZoneIdentifier": [
           "subnet-0f03b078"
         ],
-        "NotificationConfiguration": {
-          "TopicARN": "arn:aws:sns:eu-west-1:334523526103:Notificaciones-ASG-Varnish",
-          "NotificationTypes": [
-            "autoscaling:EC2_INSTANCE_LAUNCH",
-            "autoscaling:EC2_INSTANCE_LAUNCH_ERROR",
-            "autoscaling:EC2_INSTANCE_TERMINATE",
-            "autoscaling:EC2_INSTANCE_TERMINATE_ERROR"
-          ]
-        },
         "LaunchConfigurationName": {
           "Ref": "lcVarnishLayer"
         },
