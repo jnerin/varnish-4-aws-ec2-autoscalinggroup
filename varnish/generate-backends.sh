@@ -23,10 +23,10 @@ BACKEND_CONFIG="
 	.probe = {
 		#.url = \"/\"; # short easy way (GET /)
 		# We prefer to only do a HEAD /
-		.request = 
+		.request =
 			\"HEAD / HTTP/1.1\"
 			\"Host: localhost\"
-			\"Connection: close\";      	
+			\"Connection: close\";
 		.interval = 5s; # check the health of each backend every 5 seconds
 		.timeout = 1s; # timing out after 1 second.
 		# If 3 out of the last 5 polls succeeded the backend is considered healthy, otherwise it will be marked as sick
@@ -58,7 +58,7 @@ fi
 # We haven't exited, so continue to generate the file
 
 for ID in $INSTANCES ; do
-	#aws ec2 describe-instances --instance-ids $ID --query Reservations[].Instances[].PublicIpAddress --output text 
+	#aws ec2 describe-instances --instance-ids $ID --query Reservations[].Instances[].PublicIpAddress --output text
 	IP="$(aws ec2 describe-instances --instance-ids $ID --query Reservations[].Instances[].PrivateIpAddress --output text )"
 	BACKEND_NAME="$(echo "${ID}_$IP" | tr -- -. __)"
 	echo "$ID -> $IP ($BACKEND_NAME)"
@@ -87,10 +87,10 @@ varnishadm vcl.load vcl-${TIMESTAMP} $VARNISH_MAINFILE
 # Switch active vcl to the new one
 varnishadm vcl.use vcl-${TIMESTAMP}
 # Scan and delete old vcls
-for i in $(varnishadm vcl.list |egrep -v "^active" |awk '{print $3;}') ; do 
+for i in $(varnishadm vcl.list |egrep -v "^active" |awk '{print $3;}') ; do
 	varnishadm vcl.discard "${i}"
 done
 
-LOG_MSG="$BACKEND_NAME varnish vcl updated with $(echo "$INSTANCES" | wc --lines) backends ($(echo "$INSTANCES" |paste --serial --delimiter=, ))"
- 
+LOG_MSG="$BACKEND_LAYER varnish vcl updated with $(echo "$INSTANCES" | wc --lines) backends ($(echo "$INSTANCES" |paste --serial --delimiter=, ))"
+
 logger --stderr --priority user.notice "$LOG_MSG"
