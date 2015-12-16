@@ -58,11 +58,7 @@ if [ -e $MD5SUM_STATEFILE ] ; then
 	if [ "$MD5SUM_NEW" == "$MD5SUM_OLD" ] ; then
 		# Nothing to do
 		exit
-	else
-		echo $MD5SUM_NEW >$MD5SUM_STATEFILE
 	fi
-else
-	echo $MD5SUM_NEW >$MD5SUM_STATEFILE
 fi
 
 # We haven't exited, so continue to generate the file
@@ -104,6 +100,10 @@ then
 fi
 # Switch active vcl to the new one
 varnishadm vcl.use vcl-${TIMESTAMP}
+
+# Update list of currently active instances
+echo $MD5SUM_NEW >$MD5SUM_STATEFILE
+
 # Scan and delete old vcls
 for i in $(varnishadm vcl.list |egrep -v "^active" |awk '{print $3;}') ; do
 	varnishadm vcl.discard "${i}"
